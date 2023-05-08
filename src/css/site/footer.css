@@ -1,0 +1,40 @@
+/*============ footer ============*/
+footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    background-color: var(--bg-color-footer);
+    margin-top: 30px;
+    padding: 10px 0;
+}
+
+.copyright {
+    color: var(--color-copyright);
+    line-height: 1;
+}
+/*============ BREAKPOINTS ============*/
+/* Default screen devices */
+.copyright {
+    font-size: 10px;
+}
+/* Small screen devices (596px and above) */
+@media screen and (min-width: 596px) {
+    .copyright {
+        font-size: 12px;
+    }
+    footer{
+        height: 50px;
+    }
+}
+/* Large screen devices */
+@media screen and (min-width: 992px) {
+    .copyright {
+        font-size: 14px;
+    }
+    footer{
+        height: 60px;
+    }
+}
+/*============ BREAKPOINTS ============*/
+/*============ footer ============*/

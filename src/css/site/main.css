@@ -1,0 +1,52 @@
+/*============ BASE TAG ============*/
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/*============ BREAKPOINTS ============*/
+/* Default screen devices */
+html{
+    font-size: 12px;
+}
+/* Small screen devices (596px and above) */
+@media screen and (min-width: 596px) {
+    html{
+        font-size: 16px;
+    }
+}
+/* Large screen devices */
+@media screen and (min-width: 992px) {
+    html{
+        font-size: 16px;
+    }
+}
+/*============ BREAKPOINTS ============*/
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-height: 100%;
+    max-height: 100%;
+    background-color: #F0F0F0;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+    -webkit-font-smoothing: antialiasedd!important;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/*============ BASE TAG ============*/
+
+section{
+    margin: 20px;
+}
