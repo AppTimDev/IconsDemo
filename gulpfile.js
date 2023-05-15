@@ -1,14 +1,22 @@
 const gulp = require('gulp');
-const webserver = require('gulp-webserver');
+const {
+    rimraf
+} = require('rimraf')
 const concat = require('gulp-concat');
-const minifyCSS = require('gulp-minify-css');
-const uglify = require('gulp-uglify');
 const rename = require("gulp-rename");
 const htmlreplace = require('gulp-html-replace');
 const minifyHTML = require('gulp-minify-html');
-const rimraf = require('rimraf');
-const copy = require('gulp-contrib-copy');
+const cleanCSS = require('gulp-clean-css');
+const uglify = require('gulp-uglify');
+const terser = require('gulp-terser');
+const babel = require('gulp-babel');
+const webserver = require('gulp-webserver');
 const browserSync = require('browser-sync').create();
+const { exec } = require('child_process');
+const imagemin = require("gulp-imagemin");
+// const minifyCSS = require('gulp-minify-css');
+// const copyFiles = require('gulp-contrib-copy');
+
 const uglify_options = {
     //https://github.com/mishoo/UglifyJS
     mangle: {
@@ -23,6 +31,10 @@ const uglify_options = {
         // preamble: "/* uglified */"
     }
 }
+const port = {
+    dev: 3000,
+    pro: 8080
+}
 const path = {
     src_folder: 'src/',
     dest_folder: 'dest/',
@@ -33,16 +45,133 @@ const path = {
     dest_lib_folder: 'dest/lib',
 
     src_files: 'src/**',
-    src_images_files: 'src/images/**/*',
+    src_images_files: 'src/images/**/*.{png,jpg,gif,ico}',
+    dest_images_folder: 'dest/images',
     src_icons_files: 'src/icons/**/*',
+    dest_icons_folder: 'dest/icons',
     src_ico_file: 'src/favicon.ico',
+    src_html_files: 'src/*.html',
+    src_css_files: 'src/css/*.css',
+    src_js_files: 'src/js/*.js',
 
     dest_files: 'dest/**',
-    publish_files: 'publish/**',
-    publish_folder: 'publish/',
-    deploy_folder: 'deploy',
 }
-function browserSyncInit(baseDir, port){
+
+//remove all files of the destination folder
+function clean() {
+    return rimraf(path.dest_folder);
+}
+
+// Copy all static images, icons, ico
+function copyImages() {
+    return gulp.src(path.src_images_files)
+        .pipe(imagemin({
+            interlaced: true,
+            progressive: true,
+            optimizationLevel: 5,
+            svgoPlugins: [
+                {
+                    removeViewBox: true
+                }
+            ]
+        }))
+        .pipe(gulp.dest(path.dest_images_folder));
+}
+
+function copyIco() {
+    return gulp.src(path.src_ico_file)
+        // .pipe(copyFiles())
+        // .pipe(imagemin({
+        //     interlaced: true,
+        //     progressive: true,
+        //     optimizationLevel: 5,
+        //     svgoPlugins: [
+        //         {
+        //             removeViewBox: true
+        //         }
+        //     ]
+        // }))
+        .pipe(gulp.dest(path.dest_folder));
+}
+
+function copyIcons(done) {
+    gulp.src(path.src_icons_files)
+        .pipe(imagemin({
+            interlaced: true,
+            progressive: true,
+            optimizationLevel: 5,
+            svgoPlugins: [
+                {
+                    removeViewBox: true
+                }
+            ]
+        }))
+        .pipe(gulp.dest(path.dest_icons_folder));
+    done();
+}
+
+function copyLib(done) {
+    gulp.src(path.src_lib_files)
+        .pipe(gulp.dest(path.dest_lib_folder));
+    done();
+}
+
+function html() {
+    var options = {
+        comments: false,
+        spare: false,
+        quotes: true
+    };
+    return gulp.src(path.src_html_files)
+        .pipe(htmlreplace({
+            'css': 'css/bundle.min.css',
+            'js': {
+                src: 'js/bundle.min.js',
+                tpl: '<script src="%s" defer></script>'
+            }
+        }))
+        .pipe(minifyHTML(options))
+        .pipe(gulp.dest(path.dest_folder));
+}
+
+
+//concat all css files into one bundle css file and minify this file
+function css() {
+    return gulp.src([
+        'src/css/site/order/root.css', 
+        'src/css/site/*.css',
+        'src/css/*.css'
+    ])
+    .pipe(concat('bundle.min.css'))
+    // .pipe(minifyCSS({
+    //     keepBreaks: false,
+    // }))
+    .pipe(cleanCSS({compatibility: 'ie8'}))
+    .pipe(gulp.dest(path.dest_css_folder));
+}
+
+//concat all js files into one bundle js file and minify this file
+function js() {
+    return gulp.src([
+        'src/js/site/order/root.js', 
+        'src/js/site/*.js',
+        'src/js/*.js'
+    ]).pipe(babel({
+        presets: ['@babel/env']
+    }))
+    .pipe(concat('bundle.min.js'))
+    // .pipe(terser({
+    //     keep_fnames: false,
+    //     mangle: true,
+    //     compress:true,
+    //     drop_console :true
+    //   }))
+    // .pipe(terser(uglify_options))
+    .pipe(uglify(uglify_options))
+    .pipe(gulp.dest(path.dest_js_folder));
+}
+
+function browserSyncInit(baseDir, port) {
     browserSync.init({
         server: {
             baseDir: baseDir,
@@ -50,202 +179,115 @@ function browserSyncInit(baseDir, port){
         port: port
     });
 }
+// BrowserSync
+function browserSyncDev(done) {
+    browserSyncInit(path.src_folder, port.dev)
+    done();
+}
+function browserSyncPro(done) {
+    browserSyncInit(path.dest_folder, port.pro)
+    done();
+}
 
-gulp.task('browser-dev', () => {
-    browserSyncInit(path.src_folder, 3000)
-});
-
-gulp.task('browser-pro', () => {
-    browserSyncInit(path.dest_folder, 8080)
-});
-gulp.task('watch-dev', function () {
-    gulp.watch(path.src_files).on('change', browserSync.reload);
-});
-
-gulp.task('build', ['html', 'css', 'js']);
-gulp.task('build-all', ['build', 'images', 'copy-lib']);
-gulp.task('build-reload', ['build'], function(done) {
+// BrowserSync Reload
+function browserSyncReload(done) {
     browserSync.reload();
     done();
-});
-//browser-pro
-//if any files change in source files,i.e. watch-pro task
-//build task --> browserSync.reload
-gulp.task('watch-pro', function () {
-    gulp.watch(path.src_files, ['build-reload']);
-});
+}
 
-gulp.task('dev', ['browser-dev', 'watch-dev']);
-gulp.task('pro', ['build','browser-pro', 'watch-pro']);
+// Watch files changes in source files
+//if any files change in source files, reload the browser
+function watchDev() {
+    gulp.watch(path.src_files, browserSyncReload);
+}
 
-gulp.task('server', function () {
-    gulp.src(path.dest_folder)
+// Watch files changes in source files,
+//if any files change in source files, 
+//run the build task and then reload the browser (build task --> browserSync.reload)
+function watchPro() {
+    gulp.watch(path.src_files, gulp.series(build, browserSyncReload));
+}
+
+function startServer() {
+    return gulp.src(path.dest_folder)
         .pipe(webserver({
-            port: 8080,
+            port: port.pro,
             livereload: true,
             directoryListing: false,
             open: true,
             fallback: 'index.html'
         }));
-});
+}
 
+function deploy(cb) {
+    exec('git subtree push --prefix dest origin gh-pages', (err, stdout, stderr) => {
+        if (err) {
+            console.error(`exec error: ${err}`);            
+        }
+        console.log(`${stdout}`);
+        cb();
+    });
+}
+
+//other task
 //concat all css files
-gulp.task('concat-css', function () {
-    return gulp.src('./src/css/*.css')
+function concatCss() {
+    return gulp.src(path.src_css_files)
         .pipe(concat('bundle.css'))
         .pipe(gulp.dest(path.dest_css_folder));
-});
+}
 
 //concat all js files
-gulp.task('concat-js', function () {
-    return gulp.src('./src/js/*.js')
+function concatJs(cb) {
+    return gulp.src(path.src_js_files)
         .pipe(concat('bundle.js'))
         .pipe(gulp.dest(path.dest_js_folder));
-});
+}
 
 //minify css file
-gulp.task('minify-css', ['concat-css'], function () {
-    return gulp.src('./dest/css/bundle.css')
-        .pipe(minifyCSS({
-            keepBreaks: false,
-        }))
+function minifyCss() {
+    return gulp.src(path.src_css_files)
+        .pipe(cleanCSS({compatibility: 'ie8'}))
         .pipe(rename(function (path) {
             path.basename += ".min";
             path.extname = ".css";
         }))
         .pipe(gulp.dest(path.dest_css_folder));
-});
-
-//concat all css files into one bundle css file and minify this file
-gulp.task('css', function () {
-    return gulp.src([
-            './src/css/site/order/root.css', 
-            './src/css/site/*.css',
-            './src/css/*.css'
-        ])
-        .pipe(concat('bundle.min.css'))
-        .pipe(minifyCSS({
-            keepBreaks: false,
+}
+//minify css file
+function minifyJs() {
+    return gulp.src(path.src_js_files)
+        .pipe(babel({
+            presets: ['@babel/env']
         }))
-        .pipe(gulp.dest(path.dest_css_folder));
-});
-
-//concat all css files into one bundle css file in order 
-//and minify this file
-gulp.task('css-site', function () {
-    return gulp.src([
-            './src/css/site/order/root.css', 
-            './src/css/site/*.css',
-        ])
-        .pipe(concat('site.min.css'))
-        .pipe(minifyCSS({
-            keepBreaks: false,
-        }))
-        .pipe(gulp.dest(path.dest_css_folder));
-});
-
-//concat all js files into one bundle js file and minify this file
-gulp.task('js', function () {
-    return gulp.src([
-            './src/js/site/order/root.js', 
-            './src/js/site/*.js',
-            './src/js/*.js'
-        ])    
-        .pipe(concat('bundle.min.js'))
-        .pipe(uglify(uglify_options))
-        .pipe(gulp.dest(path.dest_js_folder));
-});
-
-//uglify all js files and concat them to a bundle file
-gulp.task('bundle-js', ['concat-js'], function () {
-    return gulp.src('./dest/js/bundle.js')
         .pipe(uglify(uglify_options))
         .pipe(rename(function (path) {
             path.basename += ".min";
             path.extname = ".js";
         }))
         .pipe(gulp.dest(path.dest_js_folder));
-});
+}
 
-//uglify each js file
-gulp.task('uglify', function () {
-    return gulp.src('./src/js/*.js')
-        .pipe(uglify(uglify_options))
-        .pipe(rename(function (path) {
-            path.basename += ".min";
-            path.extname = ".js";
-        }))
-        .pipe(gulp.dest(path.dest_js_folder));
-});
+// export tasks
+const copy = gulp.parallel(copyLib, copyImages, copyIcons, copyIco);
+const build = gulp.parallel(html, css, js);
+const pro = gulp.series(build, gulp.parallel(browserSyncPro, watchPro));
+exports.clean = clean;
+exports.copy = copy;
 
-gulp.task('html', function () {
-    var options = {
-        comments: false,
-        spare: false,
-        quotes: true
-    };
-    return gulp.src('./src/*.html')
-        .pipe(htmlreplace({
-            'css': 'css/bundle.min.css',
-            'js': {
-                src: 'js/bundle.min.js', tpl: '<script src="%s" defer></script>'
-            }
-        }))
-        .pipe(minifyHTML(options))
-        .pipe(gulp.dest('./dest/'));
-});
+exports.html = html;
+exports.css = css;
+exports.js = js;
+exports.build = build;
 
-//remove all files of the destination folder
-gulp.task('clean', function (cb) {
-    rimraf(path.dest_files, cb);
-});
+exports.dev = gulp.parallel(browserSyncDev, watchDev);
+exports.pro = pro;
+exports.start = startServer;
+exports.deploy = deploy;
+exports.default = gulp.series(clean, gulp.parallel(copy, build), gulp.parallel(browserSyncPro, watchPro));
 
-//Copy files to destination folder
-gulp.task('copy-to-publish', function () {
-    gulp.src(path.dest_files)
-        .pipe(copy())
-        .pipe(gulp.dest(path.publish_folder));
-});
-gulp.task('copy-to-deploy', function () {
-    gulp.src(path.dest_files)
-        .pipe(copy())
-        .pipe(gulp.dest(path.deploy_folder));
-});
-
-gulp.task('copy-images', function() {
-    return gulp.src(path.src_images_files)
-        .pipe(copy())
-        .pipe(gulp.dest('dest/images'));
-  });
-gulp.task('copy-icons', function() {
-    return gulp.src(path.src_icons_files)
-        .pipe(copy())
-        .pipe(gulp.dest('dest/icons'));
-});
-gulp.task('copy-ico', function() {
-    return gulp.src(path.src_ico_file)
-        .pipe(copy())
-        .pipe(gulp.dest('dest'));
-    });
-
-gulp.task('copy-lib', function() {
-    return gulp.src(path.src_lib_files)
-        .pipe(copy())
-        .pipe(gulp.dest(path.dest_lib_folder));
-    });
-// Copy all static images, icons, ico
-gulp.task('images', ['copy-images', 'copy-icons', 'copy-ico'], function () {
-    console.log("Copy all static images, icons, ico files.");
-});
-
-//publish the production codes to the publish folder
-gulp.task('publish', ['build', 'images'], function () {
-    gulp.start('copy-to-publish');
-});
-//publish the production codes to the publish folder
-gulp.task('deploy', ['build', 'images'], function () {
-    gulp.start('copy-to-deploy');
-});
-
-gulp.task('default', ['build', 'pro']);
-
+//other task
+exports.concatCss = concatCss;
+exports.concatJs = concatJs;
+exports.minifyCss = minifyCss;
+exports.minifyJs = minifyJs;

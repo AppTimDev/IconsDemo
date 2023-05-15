@@ -1,5 +1,5 @@
 node_modules
 package-lock.json
-public/*
+pnpm-lock.yaml
 temp*
-publish/
+*.temp

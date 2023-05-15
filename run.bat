@@ -1,2 +1,2 @@
-npm run dev
+pnpm gulp
 pause

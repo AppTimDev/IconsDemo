@@ -1,2 +1,2 @@
-npm run build
+pnpm build
 pause

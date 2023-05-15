@@ -1,4 +1,4 @@
-document.ready(function () {
+ready(function () {
     var icons = document.getElementsByClassName("vicon_container");
     for (let i = 0; i < icons.length; i++) {
         const icon = icons[i];
@@ -10,8 +10,5 @@ document.ready(function () {
             var add = e.target.getElementsByClassName("vicon_add")[0];
             add.style="display:none;"             
         }, false);
-    }
-
-
-    
+    }    
 });
