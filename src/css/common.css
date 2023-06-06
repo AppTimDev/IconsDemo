@@ -46,11 +46,6 @@
     /* CSS3 */
 }
 
-.wrapper {
-    max-width: 100%;
-    min-height: 100vh;
-}
-
 .pointer{
     cursor: pointer;
 }
@@ -269,7 +264,9 @@ a.link-email>svg {
     padding-top: 20px;
     padding-bottom: 20px;
 }
-
+.p-10px{
+    padding: 10px;
+}
 .p-20px {
     padding: 20px;
 }

@@ -16,3 +16,9 @@
     background-color: rgba(128, 128, 128, 0.4);
 }
 /*============ SCROLL BAR ============*/
+
+#scrollToTopBtn{
+    position: fixed;
+    bottom: 60px;
+    right: 30px;
+}

@@ -46,9 +46,9 @@ html {
 }
 
 /*============ BASE TAG ============*/
-
-section{
-    margin: 20px;
+.wrapper {
+    max-width: 100%;
+    min-height: 100vh;
 }
 
 .nav-bar{

@@ -198,30 +198,30 @@
     gap: 15px;
     padding: 20px 0;
     max-width: 1000px;
+    width: 90%;
+    margin: auto;
 }
-@media only screen and (max-width: 550px){
+@media only screen and (max-width: 770px){
     .icongrid {
         grid-template-columns: repeat(6,minmax(66px,1fr));
         padding: 20px;
         width: 100%;
     }
 }
-
 @media only screen and (max-width: 660px){
     .icongrid {
-        grid-template-columns: repeat(5,minmax(66px,1fr));
+        grid-template-columns: repeat(4,minmax(66px,1fr));
         padding: 20px;
         width: 100%;
     }
 }
-@media only screen and (max-width: 770px){
+@media only screen and (max-width: 550px){
     .icongrid {
-        grid-template-columns: repeat(5,minmax(66px,1fr));
+        grid-template-columns: repeat(3,minmax(66px,1fr));
         padding: 20px;
         width: 100%;
     }
 }
-
 #menu-btn-icon-menu{
     display: '';
 }
