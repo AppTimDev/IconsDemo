@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="css/site/footer.css">
     <link rel="stylesheet" href="css/site/scrollbar.css">
     <link rel="stylesheet" href="css/site/pace.css">
+    <link rel="stylesheet" href="css/site/dropdown-menu.css">
     <link rel="stylesheet" href="css/common.css">
 
     <!-- endbuild -->
@@ -30,24 +31,30 @@
 <body>
     <div class="wrapper">
         <section style="width: 100%;margin:0;height: 60px;" class="nav-bar">
-            <div style="width: 60px;height: 60px;display: inline-block;">
-                <div class="menu-btn" style="padding: 16px;cursor: pointer;">
-                    <i id="menu-btn-icon-menu" class='bx bx-menu' style="font-size: 28px;"></i>
-                    <i id="menu-btn-icon-cancel" class='bx bx-x' style="font-size: 28px;transform: rotateY(0deg) rotate(45deg);transition: transform 0.1s;display: none;"></i>
+            <div>
+                <div style="width: 60px;height: 60px;display: inline-block;">
+                    <div class="menu-btn" style="padding: 16px;cursor: pointer;">
+                        <i id="menu-btn-icon-menu" class='bx bx-menu' style="font-size: 28px;"></i>
+                        <i id="menu-btn-icon-cancel" class='bx bx-x' style="font-size: 28px;transform: rotateY(0deg) rotate(45deg);transition: transform 0.1s;display: none;"></i>
+                    </div>
                 </div>
-            </div>
-            <!-- <div style="background-color:#f3f6fc;width: 60px;height: 60px;display: inline-block;">
-                <div class="menu-btn" style="padding: 16px;cursor: pointer;">
-                    <i class='bx bx-menu' style="font-size: 28px;"></i>
-                </div>
-            </div> -->
+                <!-- <div style="background-color:#f3f6fc;width: 60px;height: 60px;display: inline-block;">
+                    <div class="menu-btn" style="padding: 16px;cursor: pointer;">
+                        <i class='bx bx-menu' style="font-size: 28px;"></i>
+                    </div>
+                </div> -->
 
-            <div style="background-color:#F2F2F2;width:32px;height: 32px;border-radius: 999px;padding: 6px;position: absolute;right:200px;top:14px; cursor: pointer;">
-                <i class='bx bx-user' style="color:#888888;font-size: 20px;"></i>
+                <div style="background-color:#F2F2F2;width:32px;height: 32px;border-radius: 999px;padding: 6px;position: absolute;right:200px;top:14px; cursor: pointer;">
+                    <i class='bx bx-user' style="color:#888888;font-size: 20px;"></i>
+                </div>
+                <div style="border: #888888 1px solid;width:32px;height: 32px;border-radius: 999px;padding: 5px;position: absolute;right:260px;top:14px;cursor: pointer;">
+                    <i class='bx bx-user' style="color:#888888;font-size: 20px;"></i>
+                </div>
             </div>
-            <div style="border: #888888 1px solid;width:32px;height: 32px;border-radius: 999px;padding: 5px;position: absolute;right:260px;top:14px;cursor: pointer;">
-                <i class='bx bx-user' style="color:#888888;font-size: 20px;"></i>
-            </div>
+            <ul class="dropdown-munu" style="display:none">
+                <li class="dropdown-munu-item"><a href="/">Home</a></li>
+                <li class="dropdown-munu-item"><a href="https://boxicons.com/">Boxicons</a></li>
+            </ul>
         </section>
 
         <section>

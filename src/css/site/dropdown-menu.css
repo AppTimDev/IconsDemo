@@ -1,0 +1,38 @@
+.dropdown-munu-btn {
+    cursor: pointer;
+}
+
+.dropdown-munu {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    box-shadow: -5px 6px 5px 0px rgba(0, 0, 0, 0.25);
+    background-color: #fff;
+}
+
+ul.dropdown-munu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+li.dropdown-munu-item {
+    display: block;
+
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.dropdown-munu>li>a {
+    display: block;
+    color: inherit;
+    text-decoration: inherit;
+    font-weight: 700;
+    padding: 10px;
+}
+
+.dropdown-munu>li:hover {
+    background-color: #666666;
+    color: #fff;
+}
