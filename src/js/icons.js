@@ -26,8 +26,7 @@ ready(function () {
             const menuIcon = document.getElementById('menu-btn-icon-menu')
             const cancelIcon = document.getElementById('menu-btn-icon-cancel')
             toggle(menuIcon)
-            toggle(cancelIcon)
-
+            toggle(cancelIcon)            
             const dropdownMenu = document.getElementsByClassName("dropdown-munu");
             for (let i = 0; i < dropdownMenu.length; i++) {
                 const menu = dropdownMenu[i];
@@ -36,4 +35,20 @@ ready(function () {
 
         }, false);
     }
+    document.addEventListener("click", (e) => {
+        //set true from outside to inside
+        //document click -> menu click for clicking elements with classname 'menu-btn-event'
+        const bMenu = e.target.classList.contains('menu-btn-event')
+        if(!bMenu){
+            const dropdownMenu = document.getElementsByClassName("dropdown-munu");
+            const menuIcon = document.getElementById('menu-btn-icon-menu')
+            const cancelIcon = document.getElementById('menu-btn-icon-cancel')
+            for (let i = 0; i < dropdownMenu.length; i++) {
+                const menu = dropdownMenu[i];
+                menu.style.display = 'none';
+            }
+            menuIcon.style.display = 'unset';
+            cancelIcon.style.display = 'none';
+        }
+    }, true);
 });
